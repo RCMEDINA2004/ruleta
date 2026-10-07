@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruleta de preguntas · Vínculo afectivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rosa:#ec407a; --rosa-osc:#c2255c; --lila:#b79df0; --menta:#bfead9; --durazno:#ffe2c4; --cielo:#cfe6fb;
+  --tinta:#4a2342; --crema:#fff8fb;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{min-height:100%;scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:light}
+body{
+  min-height:100vh;min-height:100svh;margin:0;color:var(--tinta);
+  font-family:"Fredoka","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  background:
+    radial-gradient(60vmax 60vmax at 10% 5%, #ffd3e3 0%, transparent 60%),
+    radial-gradient(55vmax 55vmax at 95% 15%, #e3d6ff 0%, transparent 60%),
+    radial-gradient(60vmax 60vmax at 85% 100%, #cdf2e3 0%, transparent 60%),
+    radial-gradient(50vmax 50vmax at 0% 95%, #ffe9cf 0%, transparent 60%),
+    #fff1f6;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-x:hidden;
+}
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.hearts i{position:absolute;bottom:-40px;font-style:normal;opacity:0;animation:sube linear infinite}
+@keyframes sube{0%{transform:translateY(0) rotate(-10deg);opacity:0}10%{opacity:.55}90%{opacity:.4}100%{transform:translateY(-110vh) rotate(14deg);opacity:0}}
+
+main{position:relative;z-index:1;width:100%;margin-block:auto;padding:16px 12px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+h1{margin:0;font-size:clamp(1.5rem,4.6vw,2.3rem);font-weight:700;color:var(--rosa-osc);text-align:center;line-height:1.1}
+.sub{margin:0;font-size:clamp(.95rem,2.6vw,1.1rem);color:#7a4a6e;text-align:center}
+
+.stage{
+  position:relative;
+  width:min(92vw, max(260px, calc(100vh - 170px)), 660px);
+  width:min(92vw, max(260px, calc(100svh - 170px)), 660px);
+  aspect-ratio:1;
+  margin-top:6px;
+}
+.wheel{
+  position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  box-shadow:0 14px 26px rgba(194,37,92,.28);
+}
+.wheel img{
+  display:block;width:100%;height:100%;border-radius:50%;
+  clip-path:circle(49.2% at 50.06% 50.2%);
+  transform-origin:50.06% 50.2%;
+  transform:rotate(0deg);
+  transition:transform 6s cubic-bezier(.13,.62,.1,1);
+  backface-visibility:hidden;
+  will-change:transform;
+  user-select:none;-webkit-user-drag:none;
+}
+.pointer{
+  position:absolute;left:50.1%;top:0;width:12.6%;transform:translateX(-50%);transform-origin:50% 0;
+  z-index:3;filter:drop-shadow(0 4px 4px rgba(120,20,60,.35));pointer-events:none;
+}
+.pointer.tick{animation:tick .18s ease-out}
+@keyframes tick{50%{transform:translateX(-50%) rotate(-7deg)}}
+
+.centro{
+  position:absolute;left:50.06%;top:50.2%;width:39.07%;aspect-ratio:1;transform:translate(-50%,-50%);
+  border:0;border-radius:50%;cursor:pointer;z-index:4;padding:0;
+  background:url(img/centro.png) center/100% 100% no-repeat transparent;
+  filter:drop-shadow(0 5px 7px rgba(194,37,92,.35));
+  transition:transform .15s ease;
+  animation:late 2.2s ease-in-out infinite;
+  -webkit-tap-highlight-color:transparent;
+}
+.centro:hover{transform:translate(-50%,-50%) scale(1.05)}
+.centro:active{transform:translate(-50%,-50%) scale(.95)}
+.centro:focus-visible{outline:4px solid #7e57c2;outline-offset:4px}
+.centro[aria-disabled="true"]{cursor:progress;animation:none}
+@keyframes late{50%{transform:translate(-50%,-50%) scale(1.05)}}
+
+/* Modal */
+dialog{
+  border:0;padding:0;background:transparent;max-width:min(92vw,520px);width:100%;
+  margin:auto;overflow:visible;
+}
+dialog::backdrop{background:rgba(92,30,76,.45);backdrop-filter:blur(4px)}
+dialog[open]{animation:entra .35s cubic-bezier(.2,1.2,.4,1)}
+@keyframes entra{from{transform:scale(.8) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.card{
+  position:relative;background:var(--crema);border-radius:28px;padding:44px 24px 24px;text-align:center;
+  border:4px solid var(--c,#ec407a);
+  box-shadow:0 20px 50px rgba(92,30,76,.35);
+}
+.num{
+  position:absolute;left:50%;top:0;transform:translate(-50%,-50%);
+  width:68px;height:68px;border-radius:50%;background:var(--c,#ec407a);color:#fff;
+  display:grid;place-items:center;font-size:2rem;font-weight:700;border:5px solid #fff;
+  box-shadow:0 6px 14px rgba(0,0,0,.2);
+}
+.card h2{margin:6px 0 8px;font-size:.95rem;font-weight:500;color:#8a4d79}
+.card p{margin:0 0 22px;font-size:clamp(1.3rem,5.4vw,1.8rem);font-weight:600;line-height:1.25;color:var(--tinta)}
+.acciones{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{
+  font:inherit;font-weight:600;font-size:1.05rem;border-radius:999px;padding:12px 24px;cursor:pointer;
+  border:3px solid var(--rosa);min-height:48px;
+}
+.btn.sec{background:#fff;color:var(--rosa-osc)}
+.btn.pri{background:var(--rosa);color:#fff;box-shadow:0 5px 0 var(--rosa-osc)}
+.btn.pri:active{transform:translateY(3px);box-shadow:0 2px 0 var(--rosa-osc)}
+.btn:focus-visible{outline:4px solid #7e57c2;outline-offset:3px}
+
+@media (max-width:480px){.card{padding:42px 16px 18px;border-radius:22px}.btn{flex:1 1 100%}}
+@media (prefers-reduced-motion:reduce){
+  .hearts{display:none}.centro{animation:none}dialog[open]{animation:none}.pointer.tick{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="hearts" id="hearts" aria-hidden="true"></div>
+
+<main>
+  <div>
+    <h1>Ruleta de preguntas</h1>
+    <p class="sub">Vínculo afectivo entre mamá y recién nacido</p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="wheel"><img id="wheelImg" src="img/ruleta.jpg" alt="Ruleta con 8 preguntas sobre el vínculo afectivo entre la madre y el recién nacido" draggable="false"></div>
+    <svg class="pointer" id="pointer" viewBox="0 0 142 112" aria-hidden="true">
+      <path d="M12 8H130L71 100Z" fill="#ff6b98" stroke="#ff6b98" stroke-width="16" stroke-linejoin="round"/>
+      <path d="M12 8H130L71 100Z" fill="#ff4f86" stroke="#fff" stroke-width="9" stroke-linejoin="round"/>
+    </svg>
+    <button class="centro" id="girar" type="button" aria-label="Girar la ruleta"></button>
+  </div>
+</main>
+
+<dialog id="modal" aria-labelledby="mTitulo">
+  <div class="card" id="card">
+    <div class="num" id="mNum">1</div>
+    <h2 id="mTitulo">Pregunta</h2>
+    <p id="mTexto"></p>
+    <div class="acciones">
+      <button class="btn sec" id="cerrar" type="button">Cerrar</button>
+      <button class="btn pri" id="otra" type="button">Girar otra vez</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  // Ángulos medidos en grados, en sentido horario desde la flecha (arriba), sobre la imagen sin girar.
+  var P=[
+    {q:"¿Qué es el vínculo afectivo entre la madre y el recién nacido?",c:-10,h:24,col:"#ec407a"},
+    {q:"Mencione un beneficio del vínculo afectivo para el bebé.",c:33,h:19,col:"#7e57c2"},
+    {q:"¿Por qué es importante el contacto piel a piel?",c:72,h:20,col:"#f59e0b"},
+    {q:"¿Cómo ayuda la lactancia materna a fortalecer el vínculo afectivo?",c:117.5,h:25,col:"#2e9e7a"},
+    {q:"¿Qué efecto tiene hablarle o cantarle al bebé?",c:174.5,h:31,col:"#ec407a"},
+    {q:"¿Por qué son importantes el contacto visual y las caricias?",c:228,h:22,col:"#2f6db5"},
+    {q:"¿Qué debemos hacer cuando el bebé llora o presenta alguna necesidad?",c:270,h:19.5,col:"#5c4cae"},
+    {q:"Mencione una forma de cuidar la salud y bienestar de la madre después del parto.",c:308,h:18,col:"#2a9d78"}
+  ];
+  var img=document.getElementById('wheelImg'), btn=document.getElementById('girar'),
+      modal=document.getElementById('modal'), pointer=document.getElementById('pointer'),
+      rot=0, busy=false, last=-1, timer=null, tickTimer=null;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DUR=reduce?1200:6000;
+
+  function girar(){
+    if(busy) return; busy=true; btn.setAttribute('aria-disabled','true');
+    var i; do{ i=Math.floor(Math.random()*P.length); }while(i===last && P.length>1);
+    last=i;
+    var s=P[i], a=s.c+(Math.random()*2-1)*s.h*0.6;          // punto de la imagen que quedará bajo la flecha
+    var extra=(((-a-rot)%360)+360)%360;
+    rot+=360*(5+Math.floor(Math.random()*3))+extra;
+    img.style.transition='transform '+DUR+'ms cubic-bezier(.13,.62,.1,1)';
+    img.style.transform='rotate('+rot+'deg)';
+    // pequeño "clic" de la flecha mientras gira
+    var n=0; clearInterval(tickTimer);
+    if(!reduce) tickTimer=setInterval(function(){
+      pointer.classList.remove('tick'); void pointer.offsetWidth; pointer.classList.add('tick');
+      if(++n>26) clearInterval(tickTimer);
+    },220);
+    clearTimeout(timer); timer=setTimeout(function(){ mostrar(i); },DUR+150);
+  }
+  function mostrar(i){
+    clearInterval(tickTimer);
+    var s=P[i];
+    document.getElementById('mNum').textContent=i+1;
+    document.getElementById('mTexto').textContent=s.q;
+    document.getElementById('mTitulo').textContent='Pregunta '+(i+1);
+    document.getElementById('card').style.setProperty('--c',s.col);
+    modal.showModal();
+  }
+  function cerrar(){ modal.close(); busy=false; btn.removeAttribute('aria-disabled'); }
+  btn.addEventListener('click',girar);
+  document.getElementById('cerrar').addEventListener('click',cerrar);
+  document.getElementById('otra').addEventListener('click',function(){ cerrar(); setTimeout(girar,250); });
+  modal.addEventListener('cancel',function(e){ e.preventDefault(); cerrar(); });
+  modal.addEventListener('click',function(e){ if(e.target===modal) cerrar(); });
+
+  // corazones de fondo
+  var box=document.getElementById('hearts'), em=['💗','💕','🤍','💜','🌸','⭐'];
+  for(var k=0;k<14;k++){
+    var el=document.createElement('i');
+    el.textContent=em[k%em.length];
+    el.style.left=(Math.random()*100)+'%';
+    el.style.fontSize=(16+Math.random()*22)+'px';
+    el.style.animationDuration=(16+Math.random()*16)+'s';
+    el.style.animationDelay=(-Math.random()*30)+'s';
+    box.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
